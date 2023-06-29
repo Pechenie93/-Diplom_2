@@ -37,7 +37,7 @@ public class Methods {
     }
 
     @Step("проверяет код создания заказа")
-    public void createOrderResponse(ValidatableResponse response, int code, Boolean status) {
+    public static void createOrderResponse(ValidatableResponse response, int code, Boolean status) {
         response.assertThat().statusCode(200).body("success", is(true));
     }
 }
