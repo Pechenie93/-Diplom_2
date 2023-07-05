@@ -11,7 +11,7 @@ public class UserTest {
     private Methods methods;
     private String accessToken;
     private int code;
-    private boolean statys;
+    private boolean status;
 
     @Before
     public void setUser() {
@@ -33,7 +33,7 @@ public class UserTest {
     public void creatureUserTest() {
         ValidatableResponse response = steps.create(user);
         accessToken = response.extract().path("accessToken").toString();
-        methods.createUserResponse(response, code, statys);
+        methods.createUserResponse(response, code, status);
 
     }
 
@@ -66,16 +66,16 @@ public class UserTest {
     @Test
     @DisplayName("Тестируем создание пользователя с одинаковым логином")
     public void creatureUserDoubleTest() {
-        ValidatableResponse response1 = steps.create(user); // Создание первого пользователя
-        methods.correctCreateUserResponse(response1);
+        ValidatableResponse responseFirst = steps.create(user); // Создание первого пользователя
+        methods.correctCreateUserResponse(responseFirst);
 
         // Удаление первого пользователя
-        String firstUserAccessToken = response1.extract().path("accessToken").toString();
+        String firstUserAccessToken = responseFirst.extract().path("accessToken").toString();
         steps.delete(firstUserAccessToken);
 
         // Создание второго пользователя с теми же учетными данными
-        ValidatableResponse response2 = steps.create(user);
-        methods.correctCreateUserResponse(response2);
+        ValidatableResponse responseSecond = steps.create(user);
+        methods.correctCreateUserResponse(responseSecond);
     }
 
 }

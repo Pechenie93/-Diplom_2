@@ -18,7 +18,7 @@ public class Steps extends Client {
         return given().log().all().spec(getSpec()).body(user).when().post(CREATE_USER_ENDPOINT).then().log().all();
     }
 
-    @Step("Авторизациця пользователя")
+    @Step("Авторизация пользователя")
     public ValidatableResponse login(LoginUser loginUser) {
         return given().log().all().spec(getSpec()).body(loginUser).when().post(LOGIN_USER_ENDPOINT).then().log().all();
     }
@@ -39,22 +39,22 @@ public class Steps extends Client {
         return given().log().all().spec(getSpec()).header("Authorization", accessToken).when().get(USER_USER_ENDPOINT).then().log().all();
     }
 
-    @Step("Создание заказа не авторезированого пользователя")
+    @Step("Создание заказа не авторизированого пользователя")
     public ValidatableResponse create() {
         return given().spec(getSpec()).when().body("{\n\"ingredients\": [\"61c0c5a71d1f82001bdaaa6d\",\"61c0c5a71d1f82001bdaaa70\",\"61c0c5a71d1f82001bdaaa73\"]\n}").post(CREATE_ORDER_ENDPOINT).then().log().all();
     }
 
-    @Step("Создание заказа авторезированого пользователя")
+    @Step("Создание заказа авторизированого пользователя")
     public ValidatableResponse create(String accessToken) {
         return given().spec(getSpec()).header("Authorization", accessToken).when().body("{\n\"ingredients\": [\"61c0c5a71d1f82001bdaaa6d\",\"61c0c5a71d1f82001bdaaa70\",\"61c0c5a71d1f82001bdaaa73\"]\n}").post(CREATE_ORDER_ENDPOINT).then().log().all();
     }
 
-    @Step("Создание заказа авторезированого пользователя неверным хешем")
+    @Step("Создание заказа авторизированого пользователя неверным хешем")
     public ValidatableResponse createNeverIngredients(String accessToken) {
         return given().spec(getSpec()).header("Authorization", accessToken).when().body("{\n\"ingredients\": [\"91c0c5a71d1f82001bdaaa6d\",\"91c0c5a71d1f82001bdaaa70\",\"91c0c5a71d1f82001bdaaa73\"]\n}").post(CREATE_ORDER_ENDPOINT).then().log().all().statusCode(400).and().assertThat().body("message", equalTo("One or more ids provided are incorrect"));
     }
 
-    @Step("Создание заказа авторезированого пользователя без ингридиентов")
+    @Step("Создание заказа авторизированого пользователя без ингридиентов")
     public ValidatableResponse createNoIngredients(String accessToken) {
         return given().spec(getSpec()).header("Authorization", accessToken).when().post(CREATE_ORDER_ENDPOINT).then().log().all().assertThat().statusCode(400).and().body("message", equalTo("Ingredient ids must be provided"));
     }
