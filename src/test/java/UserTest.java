@@ -66,16 +66,19 @@ public class UserTest {
     @Test
     @DisplayName("Тестируем создание пользователя с одинаковым логином")
     public void creatureUserDoubleTest() {
-        ValidatableResponse responseFirst = steps.create(user); // Создание первого пользователя
+        // Создание первого пользователя
+        ValidatableResponse responseFirst = steps.create(user);
         methods.correctCreateUserResponse(responseFirst);
+
+        // Создание второго пользователя с теми же учетными данными
+        ValidatableResponse responseSecond = steps.create(user);
+
+        // Проверка, что второй пользователь не создался
+        responseSecond.assertThat().statusCode(400);
 
         // Удаление первого пользователя
         String firstUserAccessToken = responseFirst.extract().path("accessToken").toString();
         steps.delete(firstUserAccessToken);
-
-        // Создание второго пользователя с теми же учетными данными
-        ValidatableResponse responseSecond = steps.create(user);
-        methods.correctCreateUserResponse(responseSecond);
     }
 
 }
