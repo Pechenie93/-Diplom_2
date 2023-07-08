@@ -11,7 +11,7 @@ public class LoginTest {
     private Methods methods;
     private String accessToken;
     private int code;
-    private boolean statys;
+    private boolean status;
 
     @Before
     public void setUser() {
@@ -35,7 +35,7 @@ public class LoginTest {
         steps.create(user);
         ValidatableResponse response = steps.login(loginUser);
         accessToken = response.extract().path("accessToken").toString();
-        methods.createUserResponse(response, code, statys);
+        methods.createUserResponse(response, code, status);
 
     }
 
