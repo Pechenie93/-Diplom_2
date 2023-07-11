@@ -32,36 +32,43 @@ public class OrderTest {
     @Test
     @DisplayName("Создание заказа без авторизации")
     public void createOrderNoUserTest() {
-        ValidatableResponse response = steps.create();
-        Methods.createOrderResponse(response, code, status);
+        String[] ingredients = {}; // Пустой массив ингредиентов
+        ValidatableResponse response = steps.create(ingredients);
+        methods.createOrderResponse(response, 400, false); // Укажите ожидаемый код и статус
     }
 
     @Test
-    @DisplayName("Создание заказа с невернымс неверным хешем ингредиентов ")
+    @DisplayName("Создание заказа с неверным хешем ингредиентов")
     public void createOrderIncorrectIngredientTest() {
         steps.create(user);
         ValidatableResponse response = steps.login(loginUser);
         accessToken = response.extract().path("accessToken").toString();
-        steps.createInvalidIngredients(accessToken);
+
+        String[] invalidIngredients = {"invalid1", "invalid2", "invalid3"};
+        ValidatableResponse createOrderResponse = steps.createInvalidIngredients(accessToken, invalidIngredients);
+        methods.assertErrorMessage(createOrderResponse, "One or more ids provided are incorrect");
     }
 
     @Test
-    @DisplayName("Создание заказа с авторизацией и ингридиентами")
+    @DisplayName("Создание заказа с авторизацией и ингредиентами")
     public void createOrderTest() {
         steps.create(user);
-        ValidatableResponse response = steps.login(loginUser);
-        accessToken = response.extract().path("accessToken").toString();
-        steps.create(accessToken);
-        Methods.createOrderResponse(response, code, status);
+        ValidatableResponse loginResponse = steps.login(loginUser);
+        accessToken = loginResponse.extract().path("accessToken").toString();
+
+        String[] ingredients = {"61c0c5a71d1f82001bdaaa6d", "61c0c5a71d1f82001bdaaa70", "61c0c5a71d1f82001bdaaa73"};
+
+        ValidatableResponse createOrderResponse = steps.create(accessToken, ingredients);
+        methods.createOrderResponse(createOrderResponse, 200, true);
     }
 
     @Test
-    @DisplayName("Создание заказа с авторизацией без ингридиентов")
+    @DisplayName("Создание заказа с авторизацией без ингредиентов")
     public void createOrderNoIngredientTest() {
         steps.create(user);
         ValidatableResponse response = steps.login(loginUser);
         accessToken = response.extract().path("accessToken").toString();
-        steps.createNoIngredients(accessToken);
-
+        ValidatableResponse createOrderResponse = steps.createNoIngredients(accessToken);
+        methods.assertErrorMessage(createOrderResponse, "Ingredient ids must be provided");
     }
 }

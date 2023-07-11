@@ -1,6 +1,6 @@
 import io.qameta.allure.Step;
 import io.restassured.response.ValidatableResponse;
-
+import java.util.Arrays;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -75,8 +75,8 @@ public class Steps extends Client {
     }
 
     @Step("Создание заказа неавторизированного пользователя")
-    public ValidatableResponse create() {
-        String requestBody = "{\n\"ingredients\": [\"61c0c5a71d1f82001bdaaa6d\",\"61c0c5a71d1f82001bdaaa70\",\"61c0c5a71d1f82001bdaaa73\"]\n}";
+    public ValidatableResponse create(String[] ingredients) {
+        String requestBody = this.createRequestBody(ingredients);
         return given()
                 .spec(getSpec())
                 .when()
@@ -87,8 +87,8 @@ public class Steps extends Client {
     }
 
     @Step("Создание заказа авторизированного пользователя")
-    public ValidatableResponse create(String accessToken) {
-        String requestBody = "{\n\"ingredients\": [\"61c0c5a71d1f82001bdaaa6d\",\"61c0c5a71d1f82001bdaaa70\",\"61c0c5a71d1f82001bdaaa73\"]\n}";
+    public ValidatableResponse create(String accessToken, String[] ingredients) {
+        String requestBody = this.createRequestBody(ingredients);
         return given()
                 .spec(getSpec())
                 .header("Authorization", accessToken)
@@ -98,9 +98,10 @@ public class Steps extends Client {
                 .then()
                 .log().all();
     }
+
     @Step("Создание заказа авторизированного пользователя с неверным хешем ингредиентов")
-    public ValidatableResponse createInvalidIngredients(String accessToken) {
-        String requestBody = "{\n\"ingredients\": [\"91c0c5a71d1f82001bdaaa6d\",\"91c0c5a71d1f82001bdaaa70\",\"91c0c5a71d1f82001bdaaa73\"]\n}";
+    public ValidatableResponse createInvalidIngredients(String accessToken, String[] ingredients) {
+        String requestBody = this.createRequestBody(ingredients);
         return given()
                 .spec(getSpec())
                 .header("Authorization", accessToken)
@@ -116,17 +117,22 @@ public class Steps extends Client {
 
     @Step("Создание заказа авторизированного пользователя без ингридиентов")
     public ValidatableResponse createNoIngredients(String accessToken) {
+        String requestBody = this.createRequestBody(new String[0]); // Пустой массив ингредиентов
         return given()
                 .spec(getSpec())
                 .header("Authorization", accessToken)
                 .when()
+                .body(requestBody)
                 .post(CREATE_ORDER_ENDPOINT)
                 .then()
                 .log().all()
-                .assertThat()
                 .statusCode(400)
                 .and()
                 .body("message", equalTo("Ingredient ids must be provided"));
+    }
+
+    private String createRequestBody(String[] ingredients) {
+        return "{\n\"ingredients\": " + Arrays.toString(ingredients) + "\n}";
     }
 
     @Step("Получение ингридиентов")

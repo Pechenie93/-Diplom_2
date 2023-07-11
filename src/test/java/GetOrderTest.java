@@ -38,9 +38,13 @@ public class GetOrderTest {
     @DisplayName("Получение списка заказов зарегестрированого пользователя")
     public void getOrderUserTest() {
         steps.create(user);
-        ValidatableResponse response = steps.login(loginUser);
-        accessToken = response.extract().path("accessToken").toString();
-        steps.create(accessToken);
+        ValidatableResponse loginResponse = steps.login(loginUser);
+        accessToken = loginResponse.extract().path("accessToken").toString();
+
+        String[] ingredients = {"61c0c5a71d1f82001bdaaa6d", "61c0c5a71d1f82001bdaaa70", "61c0c5a71d1f82001bdaaa73"};
+
+        ValidatableResponse createOrderResponse = steps.create(accessToken, ingredients);
+
         steps.getOrders(accessToken);
     }
 }
